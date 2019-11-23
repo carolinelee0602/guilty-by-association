@@ -1,0 +1,359 @@
+%-----------------------------------------------------------------------
+% Job configuration created by cfg_util (rev $Rev: 4252 $)
+%-----------------------------------------------------------------------
+clear;
+clc;
+% STEP 1: define your work dictory
+img_dir = '/data3/LiZhiai/beijing_fmri/CCG_SPM/Nifti-spm';
+load('/data3/LiZhiai/beijing_fmri/Batch/SPM/onset_forresponsibility/onset1_CCG.mat');
+load('/data3/LiZhiai/beijing_fmri/Batch/SPM/onset_forresponsibility/onset2_CCG.mat');
+load('/data3/LiZhiai/beijing_fmri/Batch/SPM/onset_forresponsibility/onset3_CCG.mat');
+folderstruct = dir(fullfile(img_dir,'CCG*'));
+FunImg_sublist = {};
+for i = 1:length(folderstruct)
+    FunImg_sublist{i} = folderstruct(i).name;
+end;
+numsub = length(FunImg_sublist)
+
+% 1ST LEVEL MODEL
+FirstLevel_dir = '/data3/LiZhiai/beijing_fmri/CCG_SPM/first_level/Model_forresponsibility';
+if ~exist(FirstLevel_dir,'dir')
+    mkdir(FirstLevel_dir);
+end;
+cond_name = {'outcome1','outcome2','outcome3','outcome4','outcome5','outcome6','outcome7','outcome8','allocate','groupcue','ingroup_involve','outgroup_involve','ingroup_noninvolve','outgroup_noninvolve','paindelivery','missgroup'};
+num_cond = length(cond_name);
+n = 0; 
+subnotwork = [];
+%runlist = [1:27 29:numsb];
+runlist = [1:numsub];
+for sub = runlist
+    FunImg_sublist{sub}
+    clear matlabbatch;
+    FirstLevel_path = fullfile(FirstLevel_dir,FunImg_sublist{sub});
+    if ~exist(FirstLevel_path,'dir')
+       mkdir(FirstLevel_path);
+    end; 
+    existfile = dir(fullfile(FirstLevel_path,'SPM.mat'));
+    if length(existfile) == 1
+%      cd(FunImg_path);
+%      delete('SPM.mat');
+%   end;
+    else
+        matlabbatch{1}.spm.stats.fmri_spec.dir = {FirstLevel_path};
+        matlabbatch{1}.spm.stats.fmri_spec.timing.units = 'scans'; %%use the tr units as the analysis unit
+        matlabbatch{1}.spm.stats.fmri_spec.timing.RT = 2.0; % TR=2s
+        matlabbatch{1}.spm.stats.fmri_spec.timing.fmri_t = 33;% ��40��
+        matlabbatch{1}.spm.stats.fmri_spec.timing.fmri_t0 = 1; % use the middle slice as the reference slice
+        runs = dir(fullfile(img_dir,FunImg_sublist{sub},'*run*'));% extract the run name 
+        numrun = length(runs);
+        numsess = numrun;
+        for s = 1: numsess
+            run = s;
+            FunImg_path = fullfile(img_dir,FunImg_sublist{sub},runs(run).name)
+            filestruct = dir(fullfile(FunImg_path,'swra*.nii')); %use zhangli'word the material to be used to analysis
+            filelist = {};
+            for i = 1:length(filestruct)
+                filelist{i} = fullfile(FunImg_path,filestruct(i).name);
+            end;
+            multi_reg = dir(fullfile(FunImg_path,'rp_a*.txt'));  %%%read the head motion paramrit
+            matlabbatch{1}.spm.stats.fmri_spec.sess(s).scans = filelist';
+            breakout = 0;
+            
+            clear onset
+            if s == 1
+                onset = onset1;
+            elseif s == 2
+                onset = onset2;
+            else
+                onset = onset3;
+            end
+            
+            for c = 1:num_cond
+                if c == 1 % outcome1
+                    condonset = onset{sub,1};
+                    condduration = 2000/2000;
+                elseif c == 2 %outcome2
+                    condonset = onset{sub,2};
+                    condduration = 2000/2000; %%%divided by 2000 to change to tr unite
+                elseif c == 3 %outcome3
+                    condonset = onset{sub,3};
+                    condduration = 2000/2000;     
+                elseif c == 4 %outcome4
+                    condonset = onset{sub,4};
+                    condduration = 2000/2000;
+                elseif c == 5 %outcome5
+                    condonset = onset{sub,5};
+                    condduration = 2000/2000;    
+                elseif c == 6 %outcome6
+                    condonset = onset{sub,6};
+                    condduration = 2000/2000;
+                elseif c == 7 %outcome7
+                    condonset = onset{sub,7};
+                    condduration = 2000/2000;
+                elseif c == 8 %outcome8
+                    condonset = onset{sub,8};
+                    condduration = 2000/2000;
+                elseif c == 9 %allocate
+                    condonset = onset{sub,9};
+                    condduration = onset{sub,10};
+                elseif c == 10 %groupcue
+                    condonset = onset{sub,11};
+                    condduration = 4300/2000;
+                elseif c == 11 %ingroup_involve
+                    condonset = onset{sub,12};
+                    condduration = 2000/2000;
+                elseif c == 12 %outgroup_involve
+                    condonset = onset{sub,13};
+                    condduration = 2000/2000;                    
+                elseif c == 13 %ingroup_noninvolve
+                    condonset = onset{sub,14};
+                    condduration = 2000/2000;
+                elseif c == 14 %outgroup_noninvolve
+                    condonset = onset{sub,15};
+                    condduration = 2000/2000;
+                elseif c == 15 %pain delivery
+                    condonset = onset{sub,16};
+                    condduration = 1500/2000;
+                elseif c == 16 %missgroup
+                    condonset = onset{sub,17};
+                    condduration = 4300/2000;
+                    
+                end;
+                if isempty(condonset)
+                    breakout = 1;   %%%% if the onset of regressor is empty,then the scrip will stop run and break out
+                end;
+                
+                matlabbatch{1}.spm.stats.fmri_spec.sess(s).cond(c).name = cond_name{c};
+                matlabbatch{1}.spm.stats.fmri_spec.sess(s).cond(c).onset = condonset;
+                matlabbatch{1}.spm.stats.fmri_spec.sess(s).cond(c).duration = condduration;
+                matlabbatch{1}.spm.stats.fmri_spec.sess(s).cond(c).tmod = 0;
+
+%                 if c == 10 
+%                     matlabbatch{1}.spm.stats.fmri_spec.sess(s).cond(c).pmod.name = 'KeyPress';
+%                     matlabbatch{1}.spm.stats.fmri_spec.sess(s).cond(c).pmod.param = KeyPress;
+%                     matlabbatch{1}.spm.stats.fmri_spec.sess(s).cond(c).pmod.poly = 1; %Э���� ����
+%                 else
+%                     matlabbatch{1}.spm.stats.fmri_spec.sess(s).cond(c).pmod = struct('name', {}, 'param', {}, 'poly', {});
+%                 end;               
+            end;
+            matlabbatch{1}.spm.stats.fmri_spec.sess(s).multi = {''};
+            matlabbatch{1}.spm.stats.fmri_spec.sess(s).multi_reg = {fullfile(FunImg_path,multi_reg.name)};
+            matlabbatch{1}.spm.stats.fmri_spec.sess(s).hpf = 128;
+        end;
+        matlabbatch{1}.spm.stats.fmri_spec.fact = struct('name', {}, 'levels', {});
+        matlabbatch{1}.spm.stats.fmri_spec.bases.hrf.derivs = [0 0];
+        matlabbatch{1}.spm.stats.fmri_spec.volt = 1;
+        matlabbatch{1}.spm.stats.fmri_spec.global = 'None';
+        matlabbatch{1}.spm.stats.fmri_spec.mask = {''};
+        matlabbatch{1}.spm.stats.fmri_spec.cvi = 'AR(1)';
+        if breakout == 0
+             spm_jobman('run',matlabbatch);
+        else
+             fprintf(FunImg_path);fprintf('\tsub');fprintf(num2str(sub));fprintf('do not work');
+             n = n+1;
+             subnotwork(n) = sub;
+        end;
+    end;
+end;
+%% Estimate
+% model 1:
+% duration��ʵ�ʵ�ֵ��distribute_amount��ΪCG_threat��������Э������distribute��������������Э����������
+for sub = 1:numsub
+%     runs = dir(strcat(FirstLevel_dir,'\',FunImg_sublist{sub},'\*run*'));
+    numrun = 1;
+    for run = 1:numrun
+        clear matlabbatch;
+        FirstLevel_path = strcat(FirstLevel_dir,'/',FunImg_sublist{sub})
+        filestruct = dir(strcat(FirstLevel_path,'/SPM.mat'));
+        filelist = {};
+        for i = 1:length(filestruct)
+            filelist{i} = strcat(FirstLevel_path,'/',filestruct(i).name);
+        end;
+        matlabbatch{1}.spm.stats.fmri_est.spmmat = filelist;
+        matlabbatch{1}.spm.stats.fmri_est.method.Classical = 1;
+        existfile = dir(strcat(FirstLevel_path,'/beta*'));
+        if isempty(existfile)
+            spm_jobman('run',matlabbatch);
+        end;
+    end;
+end;
+
+%% Contrast
+% STEP 1: define your work dictory
+folderstruct = dir(fullfile(img_dir,'CCG*'));
+FunImg_sublist = {};
+for i = 1:length(folderstruct)
+    FunImg_sublist{i} = folderstruct(i).name;
+end;
+numsub = length(FunImg_sublist)
+
+for sub = 1:numsub
+    runs = dir(fullfile(img_dir,FunImg_sublist{sub},'*run*'));
+    numrun = length(runs);
+    clear matlabbatch;
+    FunCon_path = strcat(FirstLevel_dir,'/',FunImg_sublist{sub})
+    cd(FunCon_path);
+    existfile1 = dir(fullfile(FunCon_path,'*beta*'));
+    existfile2 = dir(fullfile(FunCon_path,'*spmT*'));
+    if isempty(existfile1) %|| ~isempty(existfile2)
+    else
+    % set up the contrasts
+        bas = []; % baseline
+        mov = [0 0 0 0 0 0]; %   head motion
+        if numrun == 1%%% don't need to change this line 
+                mns = [0];
+        elseif numrun == 2
+                mns = [0 0];
+        elseif numrun == 3
+                mns = [0 0 0];
+        elseif numrun == 4
+                mns = [0 0 0 0];
+        end;% session means - change it if you have more than one session
+        numcon = 0;
+        %cond_name = {'outcome1','outcome2','outcome3','outcome4','outcome5','outcome6','outcome7','outcome8','allocate','groupcue','involve','not-involve','paindelivery','missgroup'};
+        %----single regressor----
+        numcon = numcon +1;
+        cname{numcon} = 'outcome1';             
+        simp{numcon} = [1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]; 
+        numcon = numcon +1;
+        cname{numcon} = 'outcome2';             
+        simp{numcon} = [0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0]; 
+        numcon = numcon +1;
+        cname{numcon} = 'outcome3';             
+        simp{numcon} = [0 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0]; 
+        numcon = numcon +1;
+        cname{numcon} = 'outcome4';             
+        simp{numcon} = [0 0 0 1 0 0 0 0 0 0 0 0 0 0 0 0]; 
+        numcon = numcon +1;
+        cname{numcon} = 'outcome5';             
+        simp{numcon} = [0 0 0 0 1 0 0 0 0 0 0 0 0 0 0 0];
+        numcon = numcon +1;
+        cname{numcon} = 'outcome6';             
+        simp{numcon} = [0 0 0 0 0 1 0 0 0 0 0 0 0 0 0 0]; 
+        numcon = numcon +1;
+        cname{numcon} = 'outcome7';             
+        simp{numcon} = [0 0 0 0 0 0 1 0 0 0 0 0 0 0 0 0]; 
+        numcon = numcon +1;
+        cname{numcon} = 'outcome8';             
+        simp{numcon} = [0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 0]; 
+        numcon = numcon +1;
+        cname{numcon} = 'allocate';             
+        simp{numcon} = [0 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0]; 
+        
+        
+        numcon = numcon +1;
+        cname{numcon} = 'ingroup_involve';             
+        simp{numcon} = [0 0 0 0 0 0 0 0 0 0 1 0 0 0 0 0];
+        numcon = numcon +1;
+        cname{numcon} = 'outgroup_involve';             
+        simp{numcon} = [0 0 0 0 0 0 0 0 0 0 0 1 0 0 0 0]; 
+        numcon = numcon +1;
+        cname{numcon} = 'ingroup_noninvolve';             
+        simp{numcon} = [0 0 0 0 0 0 0 0 0 0 0 0 1 0 0 0];
+        numcon = numcon +1;
+        cname{numcon} = 'outgroup_noninvolve';             
+        simp{numcon} = [0 0 0 0 0 0 0 0 0 0 0 0 0 1 0 0]; 
+%         numcon = numcon +1;
+%         cname{numcon} = 'allocate7';             
+%         simp{numcon} = [0 0 0 0 0 0 0 0 0 0 0 1 0 0 0];
+%         numcon = numcon +1;
+%         cname{numcon} = 'groupcue';             
+%         simp{numcon} = [0 0 0 0 0 0 0 0 0 0 0 0 0 0 0];
+%         numcon = numcon +1;
+%         cname{numcon} = 'paindelivery';             
+%         simp{numcon} = [0 0 0 0 0 0 0 0 0 0 0 0 0 0 0];
+%         numcon = numcon +1;
+%         cname{numcon} = 'missgroup';             
+%         simp{numcon} = [0 0 0 0 0 0 0 0 0 0 0 0 0 0 0];
+     
+        
+        %--------One sample T-test-----------
+        %involvement on the whether involvement screen
+         numcon = numcon + 1;
+         cname{numcon} = 'ingrou_outgroup_involve';
+         simp{numcon} = [0 0 0 0 0 0 0 0 0 0 1 -1 0 0 0 0]; 
+         numcon = numcon + 1;
+         cname{numcon} = 'ingrou_outgroup_noninvolve';
+         simp{numcon} = [0 0 0 0 0 0 0 0 0 0 0 0 1 -1 0 0]; 
+         
+         % (ingroup+outgroup)involved_(ingroup+outgroup)noninvolve
+         numcon = numcon + 1;
+         cname{numcon} = 'involve_noninvolve';
+         simp{numcon} = [0 0 0 0 0 0 0 0 0 0 1 1 -1 -1 0 0]; 
+        
+         
+        % group effect on the outcome screen
+        % selfgroup > othergroup
+%         numcon = numcon + 1;
+       % cname{numcon} = '(outcome1+outcome3)-(outcome5+outcome7)';
+%         numcon = numcon + 1;
+%         cname{numcon} = 'group_effect ';
+%         simp{numcon} = [1 0 1 0 -1 0 -1 0 0 0 0 0 0 0 0 0]; 
+%         % involve effect on the outcome screen
+%         % involve > noninvolve
+%         numcon = numcon + 1;
+%         %cname{numcon} = 'involve- not-involve';
+%         cname{numcon} = 'involve_notinvolve';
+%         simp{numcon} = [0 0 0 0 0 0 0 0 0 0 1 -1 0 0 0 0];
+%         %group*involve interaction on the outcome screen
+%         % involve_noninvolve interaction
+%         numcon = numcon + 1;
+%         %cname{numcon} = '(outcome1-outcome5)-(outcome3-outcome7)';
+%         cname{numcon} = 'involve_noninvolve_interaction';
+%         simp{numcon} = [1 0 -1 0 -1 0 1 0 0 0 0 0 0 0];
+%         %right>wrong
+%         numcon = numcon + 1;
+%         %cname{numcon} = '(outcome2+outcome4+outcome6+outcome8)-(outcome1+outcome3+outcome5+outcome7)';
+%         cname{numcon} = 'right_wrong';
+%         simp{numcon} = [-1 1 -1 1 -1 1 -1 1 0 0 0 0 0 0];
+%         
+        
+        
+        %simple effect     
+%         numcon = numcon + 1;
+%         cname{numcon} = 'outcome3-outcome7';
+%         simp{numcon} = [0 0 1 0 0 0 -1 0 0 0 0 0 0 0 0 0];
+%         numcon = numcon + 1;
+%         cname{numcon} = 'outcome7-outcome3';
+%         simp{numcon} = [0 0 -1 0 0 0 1 0 0 0 0 0 0 0 0 0];
+%         numcon = numcon + 1;
+%         cname{numcon} = 'outcome1-outcome5';
+%         simp{numcon} = [1 0 0 0 -1 0 0 0 0 0 0 0 0 0 0 0];
+%         numcon = numcon + 1;
+%         cname{numcon} = 'outcome5-outcome1';
+%         simp{numcon} = [-1 0 0 0 1 0 0 0 0 0 0 0 0 0 0 0];
+%         numcon = numcon + 1;
+%         cname{numcon} = 'outcome1-outcome3';
+%         simp{numcon} = [1 0 -1 0 0 0 0 0 0 0 0 0 0 0 0 0];
+%         numcon = numcon + 1;
+%         cname{numcon} = 'outcome5-outcome7';
+%         simp{numcon} = [0 0 0 0 1 0 -1 0 0 0 0 0 0 0 0 0];
+       
+                       
+        
+        for coni = 1:numcon
+            
+            if numrun ==1
+               cons{coni} = [simp{coni} mov mns];
+            elseif numrun ==2
+               cons{coni} = [simp{coni} mov simp{coni} mov mns];
+            else
+               cons{coni} = [simp{coni} mov simp{coni} mov simp{coni} mov mns];   
+            end
+            ctype{coni} = 'T';
+        end;
+        % Now set up contrasts...
+        SPMest=load('SPM.mat');
+        SPMest=SPMest.SPM;
+        % use this to make the con images
+        SPMest.xCon =[];
+        for i = 1:length(cname)
+            if isempty(SPMest.xCon)
+                SPMest.xCon = spm_FcUtil('Set',cname{i}, ctype{i},'c',cons{i}',SPMest.xX.xKXs);
+            else
+                SPMest.xCon (end+1) = spm_FcUtil('Set',cname{i}, ctype{i},'c',cons{i}',SPMest.xX.xKXs);
+            end
+        end
+        spm_contrasts(SPMest);
+    end
+end

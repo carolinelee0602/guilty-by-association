@@ -1,0 +1,357 @@
+clear;
+clc;
+spm fmri
+
+func_path = '/data3/LiZhiai/beijing_fmri/CCG_SPM';
+%subj = {'sub101' 'sub102' 'sub103' 'sub104' 'sub105' 'sub106' 'sub107' 'sub108' 'sub109' 'sub110' 'sub111' 'sub112' 'sub113' 'sub114' 'sub115' 'sub116' 'sub117' 'sub118' 'sub119' 'sub120' 'sub121' 'sub122' 'sub123' 'sub124' 'sub125' 'sub126' 'sub127'  'sub128' 'sub129' 'sub130' 'sub131'}; 
+% subj={'sub1008'}; 
+
+
+folderstruct = dir(fullfile(func_path,'aCCG*'));
+FunImg_sublist = {};
+for i = 1:length(folderstruct)
+    subj{i} = folderstruct(i).name;
+end;
+%%
+for Si = 1:length(subj)
+%for Ti = 1:length(sess)
+%   
+% if Si ~= 8 
+%     continue
+% end
+
+
+    clear zatlabbatch;
+% %     
+    data_f1 = [];
+    data_a1 = [];
+    data_r1 = [];
+    data_w1 = [];
+    
+    data_f2 = [];
+    data_a2 = [];
+    data_r2 = [];
+    data_w2 = [];
+    
+    data_f3 = [];
+    data_a3 = [];
+    data_r3 = [];
+    data_w3 = [];
+
+%     data_f4 = [];
+%     data_a4 = [];
+%     data_r4 = [];
+%     data_w4 = [];
+% 
+%     data_f5 = [];
+%     data_a5 = [];
+%     data_r5 = [];
+%     data_w5 = [];    
+% 
+%     data_f6 = [];
+%     data_a6 = [];
+%     data_r6 = [];
+%     data_w6 = [];   
+% 
+%     data_f7 = [];
+%     data_a7 = [];
+%     data_r7 = [];
+%     data_w7 = [];   
+% 
+%     data_f8 = [];
+%     data_a8 = [];
+%     data_r8 = [];
+%     data_w8 = [];    
+%     
+%     data_f9 = [];
+%     data_a9 = [];
+%     data_r9 = [];
+%     data_w9 = [];  
+%     
+%     data_f10 = [];
+%     data_a10 = [];
+%     data_r10 = [];
+%     data_w10 = [];    
+     
+    % %     
+    run_path = fullfile(func_path,subj{Si});
+    
+    
+    run_name = dir(fullfile(func_path,subj{Si},'*run1*'));
+    run1_files = dir(fullfile(run_path,run_name.name,'CCG*.nii'));
+    for i = 1:length(run1_files)
+        data_f1 = [data_f1;fullfile(run_path,run_name.name),'/',[run1_files(i).name],',1'];
+        data_a1 = [data_a1;fullfile(run_path,run_name.name),'/a',[run1_files(i).name],',1'];
+        data_r1 = [data_r1;fullfile(run_path,run_name.name),'/ra',[run1_files(i).name],',1'];
+        data_w1 = [data_w1;fullfile(run_path,run_name.name),'/wra',[run1_files(i).name],',1'];
+    end;
+    
+        data_f1 (1:5,:) = [];
+        data_a1 (1:5,:) = [];
+        data_r1 (1:5,:) = [];
+        data_w1 (1:5,:) = [];
+
+    
+    run_name = dir(fullfile(func_path,subj{Si},'*run2*'));
+    run2_files = dir(fullfile(run_path,run_name.name,'CCG*.nii'));
+    for i = 1:length(run2_files)
+        data_f2 = [data_f2;fullfile(run_path,run_name.name),'/',[run2_files(i).name],',1'];
+        data_a2 = [data_a2;fullfile(run_path,run_name.name),'/a',[run2_files(i).name],',1'];
+        data_r2 = [data_r2;fullfile(run_path,run_name.name),'/ra',[run2_files(i).name],',1'];
+        data_w2 = [data_w2;fullfile(run_path,run_name.name),'/wra',[run2_files(i).name],',1'];
+    end;
+    
+        data_f2 (1:5,:) = [];
+        data_a2 (1:5,:) = [];
+        data_r2 (1:5,:) = [];
+        data_w2 (1:5,:) = [];
+% %     
+    run_name = dir(fullfile(func_path,subj{Si},'*run3*'));
+    run3_files = dir(fullfile(run_path,run_name.name,'CCG*.nii'));
+    for i = 1:length(run3_files)
+        data_f3 = [data_f3;fullfile(run_path,run_name.name),'/',[run3_files(i).name],',1'];
+        data_a3 = [data_a3;fullfile(run_path,run_name.name),'/a',[run3_files(i).name],',1'];
+        data_r3 = [data_r3;fullfile(run_path,run_name.name),'/ra',[run3_files(i).name],',1'];
+        data_w3 = [data_w3;fullfile(run_path,run_name.name),'/wra',[run3_files(i).name],',1'];
+    end;
+    
+        data_f3 (1:5,:) = [];
+        data_a3 (1:5,:) = [];
+        data_r3 (1:5,:) = [];
+        data_w3 (1:5,:) = [];
+
+%     run_name = dir(fullfile(func_path,subj{Si},'*006*'));
+%     run4_files = dir(fullfile(run_path,run_name.name,'Z*.nii'));
+%     for i = 1:length(run4_files)
+%         data_f4 = [data_f4;fullfile(run_path,run_name.name),'/',[run4_files(i).name],',1'];
+%         data_a4 = [data_a4;fullfile(run_path,run_name.name),'/a',[run4_files(i).name],',1'];
+%         data_r4 = [data_r4;fullfile(run_path,run_name.name),'/ra',[run4_files(i).name],',1'];
+%         data_w4 = [data_w4;fullfile(run_path,run_name.name),'/wra',[run4_files(i).name],',1'];
+%     end;
+%     
+%         data_f4 (1:5,:) = [];
+%         data_a4 (1:5,:) = [];
+%         data_r4 (1:5,:) = [];
+%         data_w4 (1:5,:) = [];
+% 
+%     run_name = dir(fullfile(func_path,subj{Si},'*007*'));
+%     run5_files = dir(fullfile(run_path,run_name.name,'Z*.nii'));
+%     for i = 1:length(run5_files)
+%         data_f5 = [data_f5;fullfile(run_path,run_name.name),'/',[run5_files(i).name],',1'];
+%         data_a5 = [data_a5;fullfile(run_path,run_name.name),'/a',[run5_files(i).name],',1'];
+%         data_r5 = [data_r5;fullfile(run_path,run_name.name),'/ra',[run5_files(i).name],',1'];
+%         data_w5 = [data_w5;fullfile(run_path,run_name.name),'/wra',[run5_files(i).name],',1'];
+%     end;
+%     
+%         data_f5 (1:5,:) = [];
+%         data_a5 (1:5,:) = [];
+%         data_r5 (1:5,:) = [];
+%         data_w5 (1:5,:) = [];
+%     
+%     run_name = dir(fullfile(func_path,subj{Si},'*008*'));
+%     run6_files = dir(fullfile(run_path,run_name.name,'Z*.nii'));
+%     for i = 1:length(run6_files)
+%         data_f6 = [data_f6;fullfile(run_path,run_name.name),'/',[run6_files(i).name],',1'];
+%         data_a6 = [data_a6;fullfile(run_path,run_name.name),'/a',[run6_files(i).name],',1'];
+%         data_r6 = [data_r6;fullfile(run_path,run_name.name),'/ra',[run6_files(i).name],',1'];
+%         data_w6 = [data_w6;fullfile(run_path,run_name.name),'/wra',[run6_files(i).name],',1'];
+%     end;
+%     
+%         data_f6 (1:5,:) = [];
+%         data_a6 (1:5,:) = [];
+%         data_r6 (1:5,:) = [];
+%         data_w6 (1:5,:) = [];
+% 
+%         
+%     run_name = dir(fullfile(func_path,subj{Si},'*009*'));
+%     run7_files = dir(fullfile(run_path,run_name.name,'Z*.nii'));
+%     for i = 1:length(run1_files)
+%         data_f7 = [data_f7;fullfile(run_path,run_name.name),'/',[run7_files(i).name],',1'];
+%         data_a7 = [data_a7;fullfile(run_path,run_name.name),'/a',[run7_files(i).name],',1'];
+%         data_r7 = [data_r7;fullfile(run_path,run_name.name),'/ra',[run7_files(i).name],',1'];
+%         data_w7 = [data_w7;fullfile(run_path,run_name.name),'/wra',[run7_files(i).name],',1'];
+%     end;
+%     
+%         data_f7 (1:5,:) = [];
+%         data_a7 (1:5,:) = [];
+%         data_r7 (1:5,:) = [];
+%         data_w7 (1:5,:) = [];
+% 
+%     run_name = dir(fullfile(func_path,subj{Si},'*010*'));
+%     run8_files = dir(fullfile(run_path,run_name.name,'Z*.nii'));
+%     for i = 1:length(run8_files)
+%         data_f8 = [data_f8;fullfile(run_path,run_name.name),'/',[run8_files(i).name],',1'];
+%         data_a8 = [data_a8;fullfile(run_path,run_name.name),'/a',[run8_files(i).name],',1'];
+%         data_r8 = [data_r8;fullfile(run_path,run_name.name),'/ra',[run8_files(i).name],',1'];
+%         data_w8 = [data_w8;fullfile(run_path,run_name.name),'/wra',[run8_files(i).name],',1'];
+%     end;
+%     
+%         data_f8 (1:5,:) = [];
+%         data_a8 (1:5,:) = [];
+%         data_r8 (1:5,:) = [];
+%         data_w8 (1:5,:) = [];
+%         
+%     
+%     run_name = dir(fullfile(func_path,subj{Si},'*011*'));
+%     run9_files = dir(fullfile(run_path,run_name.name,'Z*.nii'));
+%     for i = 1:length(run9_files)
+%         data_f9 = [data_f9;fullfile(run_path,run_name.name),'/',[run9_files(i).name],',1'];
+%         data_a9 = [data_a9;fullfile(run_path,run_name.name),'/a',[run9_files(i).name],',1'];
+%         data_r9 = [data_r9;fullfile(run_path,run_name.name),'/ra',[run9_files(i).name],',1'];
+%         data_w9 = [data_w9;fullfile(run_path,run_name.name),'/wra',[run9_files(i).name],',1'];
+%     end;
+%     
+%         data_f9 (1:5,:) = [];
+%         data_a9 (1:5,:) = [];
+%         data_r9 (1:5,:) = [];
+%         data_w9 (1:5,:) = [];
+% 
+%         
+%     run_name = dir(fullfile(func_path,subj{Si},'*012*'));
+%     run10_files = dir(fullfile(run_path,run_name.name,'Z*.nii'));
+%     for i = 1:length(run10_files)
+%         data_f10 = [data_f10;fullfile(run_path,run_name.name),'/',[run10_files(i).name],',1'];
+%         data_a10 = [data_a10;fullfile(run_path,run_name.name),'/a',[run10_files(i).name],',1'];
+%         data_r10 = [data_r10;fullfile(run_path,run_name.name),'/ra',[run10_files(i).name],',1'];
+%         data_w10 = [data_w10;fullfile(run_path,run_name.name),'/wra',[run10_files(i).name],',1'];
+%     end;
+%     
+%         data_f10 (1:5,:) = [];
+%         data_a10 (1:5,:) = [];
+%         data_r10 (1:5,:) = [];
+%         data_w10 (1:5,:) = [];       
+        
+        data_a = [];
+        data_r = [];
+        data_w = [];
+%     for runi = 1:10
+      for runi = 1:3
+        data_a = [data_a;cellstr(eval(strcat('data_a',num2str(runi))))];
+        data_r = [data_r;cellstr(eval(strcat('data_r',num2str(runi))))];
+        data_w = [data_w;cellstr(eval(strcat('data_w',num2str(runi))))];
+      end
+%     data_a = [data_a1;data_a2;data_a3;data_a4;data_a5;data_a6;data_a7;data_a8;data_a9;data_a10];
+%     data_r = [data_r1;data_r2;data_r3;data_r4;data_r5;data_r6;data_r7;data_r8;data_r9;data_r10];
+%     data_w = [data_w1;data_w2;data_w3;data_w4;data_w5;data_w6;data_w7;data_w8;data_w9;data_w10];
+
+%     data_a = [data_a1;data_a2;data_a3;data_a4;data_a5;data_a6;data_a7;data_a8;data_a9];
+%     data_r = [data_r1;data_r2;data_r3;data_r4;data_r5;data_r6;data_r7;data_r8;data_r9];
+%     data_w = [data_w1;data_w2;data_w3;data_w4;data_w5;data_w6;data_w7;data_w8;data_w9];
+% %     
+    %_______SLICE TIMING_______
+    zatlabbatch{1,1}.spm.temporal.st.scans{1,1} = cellstr(data_f1);
+    zatlabbatch{1,1}.spm.temporal.st.scans{1,2} = cellstr(data_f2);
+    zatlabbatch{1,1}.spm.temporal.st.scans{1,3} = cellstr(data_f3);
+%     zatlabbatch{1,1}.spm.temporal.st.scans{1,4} = cellstr(data_f4);
+%     zatlabbatch{1,1}.spm.temporal.st.scans{1,5} = cellstr(data_f5);
+%     zatlabbatch{1,1}.spm.temporal.st.scans{1,6} = cellstr(data_f6);    
+%     zatlabbatch{1,1}.spm.temporal.st.scans{1,7} = cellstr(data_f7);
+%     zatlabbatch{1,1}.spm.temporal.st.scans{1,8} = cellstr(data_f8);
+%     zatlabbatch{1,1}.spm.temporal.st.scans{1,9} = cellstr(data_f9);   
+%     zatlabbatch{1,1}.spm.temporal.st.scans{1,10} = cellstr(data_f10);     
+    
+      
+    zatlabbatch{1,1}.spm.temporal.st.nslices = 33;
+    zatlabbatch{1,1}.spm.temporal.st.tr = 2;
+    zatlabbatch{1,1}.spm.temporal.st.ta = 2-2/33;
+    zatlabbatch{1,1}.spm.temporal.st.so = [1:2:33 2:2:32];
+    zatlabbatch{1,1}.spm.temporal.st.refslice = 1;
+    zatlabbatch{1,1}.spm.temporal.st.prefix = 'a';
+    
+    %_______REALIGN: Estimation and Reslice_______
+    zatlabbatch{1,2}.spm.spatial.realign.estimate.data{1,1} = cellstr(data_a1);
+    zatlabbatch{1,2}.spm.spatial.realign.estimate.data{1,2} = cellstr(data_a2);
+    zatlabbatch{1,2}.spm.spatial.realign.estimate.data{1,3} = cellstr(data_a3);
+%     zatlabbatch{1,2}.spm.spatial.realign.estimate.data{1,4} = cellstr(data_a4);
+%     zatlabbatch{1,2}.spm.spatial.realign.estimate.data{1,5} = cellstr(data_a5);
+%     zatlabbatch{1,2}.spm.spatial.realign.estimate.data{1,6} = cellstr(data_a6);    
+%     zatlabbatch{1,2}.spm.spatial.realign.estimate.data{1,7} = cellstr(data_a7);
+%     zatlabbatch{1,2}.spm.spatial.realign.estimate.data{1,8} = cellstr(data_a8);
+%     zatlabbatch{1,2}.spm.spatial.realign.estimate.data{1,9} = cellstr(data_a9);    
+%     zatlabbatch{1,2}.spm.spatial.realign.estimate.data{1,10} = cellstr(data_a10);    
+    
+    
+    zatlabbatch{1,2}.spm.spatial.realign.estimate.eoptions.quality = 0.9;
+	zatlabbatch{1,2}.spm.spatial.realign.estimate.eoptions.sep = 4;
+	zatlabbatch{1,2}.spm.spatial.realign.estimate.eoptions.fwhm = 5;
+	zatlabbatch{1,2}.spm.spatial.realign.estimate.eoptions.rtm = 0; 
+	zatlabbatch{1,2}.spm.spatial.realign.estimate.eoptions.interp = 2; 
+	zatlabbatch{1,2}.spm.spatial.realign.estimate.eoptions.wrap = [0 0 0]; 
+	zatlabbatch{1,2}.spm.spatial.realign.estimate.eoptions.weight = {};
+	
+%     zatlabbatch{1,3}.spm.spatial.realign.write.data = cellstr(data_a);
+    zatlabbatch{1,3}.spm.spatial.realign.write.data = data_a;
+	zatlabbatch{1,3}.spm.spatial.realign.write.roptions.which = [2 1]; 
+	zatlabbatch{1,3}.spm.spatial.realign.write.roptions.interp = 4; 
+	zatlabbatch{1,3}.spm.spatial.realign.write.roptions.wrap = [0 0 0]; 
+	zatlabbatch{1,3}.spm.spatial.realign.write.roptions.mask = 1; 
+    zatlabbatch{1,3}.spm.spatial.realign.write.roptions.prefix = 'r';
+
+    
+    
+    	%________________________SEGMENTATION (deriving normalisation parameters) _______________________
+run_name = dir(fullfile(func_path,subj{Si},'*run1*'));
+run1_path = fullfile(run_path,run_name.name)
+
+
+	mean_realign=[run1_path,'/meana',[run1_files(6).name],',1'];
+%     mean_realign=[run1_path,'/meana',[run1_files(1).name],',1'];%GE
+%  	mean_realign=[run3_path,'\meana',[run3_files(6).name],',1'];
+    zatlabbatch{1,4}.spm.spatial.preproc.data=cellstr(mean_realign);
+	zatlabbatch{1,4}.spm.spatial.preproc.output.GM=[0 0 1];
+	zatlabbatch{1,4}.spm.spatial.preproc.output.WM=[0 0 1];
+	zatlabbatch{1,4}.spm.spatial.preproc.output.CSF=[0 0 0];
+	zatlabbatch{1,4}.spm.spatial.preproc.output.biascor=1;
+	zatlabbatch{1,4}.spm.spatial.preproc.output.cleanup=0;
+	zatlabbatch{1,4}.spm.spatial.preproc.opts.tpm={['/home/Toolbox/spm8/tpm/grey.nii'];['/home/Toolbox/spm8/tpm/white.nii'];['/home/Toolbox/spm8/tpm/csf.nii']};
+	
+		
+	zatlabbatch{1,4}.spm.spatial.preproc.opts.ngaus= [2 2 2 4];
+	zatlabbatch{1,4}.spm.spatial.preproc.opts.regtype='mni';
+	zatlabbatch{1,4}.spm.spatial.preproc.opts.warpreg=1;
+	zatlabbatch{1,4}.spm.spatial.preproc.opts.warpco=25;
+	zatlabbatch{1,4}.spm.spatial.preproc.opts.biasreg=0.0001;
+	zatlabbatch{1,4}.spm.spatial.preproc.opts.biasfwhm=60;
+	zatlabbatch{1,4}.spm.spatial.preproc.opts.samp=3;
+	zatlabbatch{1,4}.spm.spatial.preproc.opts.msk={''};
+    
+    
+    %_____________________NORMALIZE: Estimate and Write_____________________
+    sour_file = [run1_path,'/meana',[run1_files(6).name],',1'];
+%     sour_file = [run1_path,'/meana',[run1_files(1).name],',1'];%GE_shangh
+%     sour_file = [run3_path,'\meana',[run3_files(6).name],',1'];
+    zatlabbatch{1,5}.spm.spatial.normalise.est.subj.source = cellstr(sour_file);
+    zatlabbatch{1,5}.spm.spatial.normalise.est.subj.wtsrc = {};
+    
+	zatlabbatch{1,5}.spm.spatial.normalise.est.eoptions.template{1,1} = '/home/Toolbox/spm8/templates/EPI.nii';
+    zatlabbatch{1,5}.spm.spatial.normalise.est.eoptions.weight = {};
+    zatlabbatch{1,5}.spm.spatial.normalise.est.eoptions.smosrc = 8;
+    zatlabbatch{1,5}.spm.spatial.normalise.est.eoptions.smoref = 0;
+    zatlabbatch{1,5}.spm.spatial.normalise.est.eoptions.regtype = 'mni';
+    zatlabbatch{1,5}.spm.spatial.normalise.est.eoptions.cutoff = 25;
+    zatlabbatch{1,5}.spm.spatial.normalise.est.eoptions.nits = 16;
+    zatlabbatch{1,5}.spm.spatial.normalise.est.eoptions.reg = 1;
+    
+    zatlabbatch{1,6}.spm.spatial.normalise.write.subj.matname = cellstr([sour_file(1,1:end-6),'_seg_sn.mat']);
+%     zatlabbatch{1,6}.spm.spatial.normalise.write.subj.resample = cellstr(data_r);
+    zatlabbatch{1,6}.spm.spatial.normalise.write.subj.resample = data_r;
+    
+    zatlabbatch{1,6}.spm.spatial.normalise.write.roptions.preserve = 0;
+    zatlabbatch{1,6}.spm.spatial.normalise.write.roptions.bb = [-78 -112 -50;78 76 85];
+    zatlabbatch{1,6}.spm.spatial.normalise.write.roptions.vox = [3 3 3];
+    zatlabbatch{1,6}.spm.spatial.normalise.write.roptions.interp = 1;
+    zatlabbatch{1,6}.spm.spatial.normalise.write.roptions.wrap = [0 0 0];
+    zatlabbatch{1,6}.spm.spatial.normalise.write.roptions.prefix = 'w';
+    
+	%_____________________SMOOTH_____________________
+% 	zatlabbatch{1,7}.spm.spatial.smooth.data = cellstr(data_w);
+    zatlabbatch{1,7}.spm.spatial.smooth.data = data_w;
+    zatlabbatch{1,7}.spm.spatial.smooth.fwhm = [8 8 8];
+	zatlabbatch{1,7}.spm.spatial.smooth.dtype = 0;
+    zatlabbatch{1,7}.spm.spatial.smooth.im = 0;
+    zatlabbatch{1,7}.spm.spatial.smooth.prefix = 's';
+
+	spm_jobman('run',zatlabbatch)
+
+%end
+end
